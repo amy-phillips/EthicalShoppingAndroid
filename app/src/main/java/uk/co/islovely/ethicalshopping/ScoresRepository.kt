@@ -82,6 +82,24 @@ object ScoresRepository {
         return title;
     }
 
+    private fun addAnyNewFoodSection(new_food : FoodSection) {
+        for (fs in foodSections) {
+            if (new_food.location == fs.location) {
+                // already in, no need to add
+                return
+            }
+        }
+        // no match, add it
+        foodSections.add(new_food)
+    }
+
+    private fun addAnyNewFoodSections(new_foods : MutableList<FoodSection>) {
+        // we match by name to check if a food already exists in our list
+        for(new_food in new_foods) {
+            addAnyNewFoodSection(new_food)
+        }
+    }
+
     private fun getScoreTables() {
         progressCallback?.invoke(0, false, emptyList())
 
@@ -106,24 +124,24 @@ object ScoresRepository {
             progressCallback?.invoke(1, am_subscribed, emptyList())
 
             // parse out product guides - food and drink
-            foodSections.addAll(parseProductGuides("<a class=\"more\" href=\"/food-drink\">Food &amp; Drink guides, news and features</a>",data));
+            addAnyNewFoodSections(parseProductGuides("<a class=\"more\" href=\"/food-drink\">Food &amp; Drink guides, news and features</a>",data));
             //health and beauty
-            foodSections.addAll(parseProductGuides("<a class=\"more\" href=\"/health-beauty\">Health &amp; Beauty guides, news and features</a>",data));
+            addAnyNewFoodSections(parseProductGuides("<a class=\"more\" href=\"/health-beauty\">Health &amp; Beauty guides, news and features</a>",data));
 
             // some more products that are stocked by supermarkets - don;t want all of home and garden tho
-            foodSections.add(FoodSection("/home-garden/shopping-guide/dishwasher-detergent"));
-            foodSections.add(FoodSection("/home-garden/shopping-guide/household-cleaners"));
-            foodSections.add(FoodSection("/home-garden/shopping-guide/laundry-detergents"));
-            foodSections.add(FoodSection("/home-garden/shopping-guide/toilet-cleaners"));
-            foodSections.add(FoodSection("/home-garden/shopping-guide/toilet-paper"));
-            foodSections.add(FoodSection("/home-garden/shopping-guide/washing-liquid"));
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/dishwasher-detergent"));
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/household-cleaners"));
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/laundry-detergents"));
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/toilet-cleaners"));
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/toilet-paper"));
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/washing-liquid"));
 
             // strip out perfume shops because it has short names and doesn't help
             foodSections.remove(FoodSection("/health-beauty/shopping-guide/perfume-shops"));
 
             // are there any cached entries that we want to throw away?
-            for (fs in foodSections) {
-                if(am_subscribed!=wasSubscribed) {
+            if(am_subscribed!=wasSubscribed) {
+                for (fs in foodSections) {
                     Log.d(LOGTAG,"Will rerequest $fs because subscription check change");
                     fs.last_success=0;
                     continue;
@@ -137,12 +155,18 @@ object ScoresRepository {
                 var progress: Float = 100.0f*index.toFloat()/foodSections.size.toFloat()
                 Log.d(LOGTAG, "Progress $index / ${foodSections.size}")
                 progressCallback?.invoke(progress.toInt(), am_subscribed, foodSections)
-                val REFRESH_MILLIS : Long = 60*1000
-                if(fs.last_success != 0L && System.currentTimeMillis() - fs.last_success > REFRESH_MILLIS)
+                val REFRESH_MILLIS : Long = 5*60*1000
+                if(fs.last_success != 0L && System.currentTimeMillis() - fs.last_success < REFRESH_MILLIS)
                 {
                     Log.d(LOGTAG,"Skipping food $fs because ${fs.last_success}")
                     continue
                 }
+
+                // no prev results, or prev results are old, so nuke any possible prev results
+                fs.good_foods.clear()
+                fs.average_foods.clear()
+                fs.bad_foods.clear()
+
                 val url = URL("https://www.ethicalconsumer.org" + fs.location)
                 val urlConnection = url.openConnection() as HttpsURLConnection
                 var cookies =
