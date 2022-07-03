@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">WebviewTest</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">Choose Shop</string>
+    <string name="tesco_fragment_label">Tesco</string>
+    <string name="tesco">Tesco</string>
+    <string name="sainsburys">Sainsburys</string>
+    <string name="ethical_consumer">Ethical Consumer</string>
+    <string name="ethical_consumer_requires_login">Ethical Consumer - Login or Subscribe</string>
+    <string name="back_to_shop_list">Back to shop selection</string>
+
+    <string name="hello_first_fragment">Choose a shop</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+</resources>
