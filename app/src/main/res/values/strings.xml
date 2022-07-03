@@ -6,6 +6,9 @@
     <string name="tesco_fragment_label">Tesco</string>
     <string name="tesco">Tesco</string>
     <string name="sainsburys">Sainsburys</string>
+    <string name="asda">Asda</string>
+    <string name="boots">Boots</string>
+    <string name="milkandmore">Milk &amp; More</string>
     <string name="ethical_consumer">Ethical Consumer</string>
     <string name="ethical_consumer_requires_login">Ethical Consumer - Login or Subscribe</string>
     <string name="back_to_shop_list">Back to shop selection</string>

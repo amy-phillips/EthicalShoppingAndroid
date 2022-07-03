@@ -69,10 +69,19 @@ class FirstFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonTesco.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            findNavController().navigate(R.id.action_FirstFragment_to_Tesco)
         }
         binding.buttonSainsburys.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            findNavController().navigate(R.id.action_FirstFragment_to_Sainsburys)
+        }
+        binding.buttonAsda.setOnClickListener {
+            findNavController().navigate(R.id.action_FirstFragment_to_Asda)
+        }
+        binding.buttonBoots.setOnClickListener {
+            findNavController().navigate(R.id.action_FirstFragment_to_Boots)
+        }
+        binding.buttonMilkandmore.setOnClickListener {
+            findNavController().navigate(R.id.action_FirstFragment_to_MilkAndMore)
         }
         binding.buttonEthicalconsumer.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_ethicalConsumerFragment)

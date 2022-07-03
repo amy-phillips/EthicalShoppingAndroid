@@ -9,16 +9,15 @@ import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
 import uk.co.islovely.ethicalshopping.databinding.FragmentSecondBinding
 import java.io.BufferedReader
 import java.io.InputStream
 
-//TODO fix bug where when you let it load all the foods, then click tesco it loads them again
-
 /**
- * A simple [Fragment] subclass as the second destination in the navigation.
+ * This fragment displays the website for eg Tesco/Sainsburys, and then pokes in the javascript to highlight it
  */
-class TescoFragment : Fragment() {
+class ShopWebsiteFragment : Fragment() {
 
     private var _binding: FragmentSecondBinding? = null
 
@@ -28,31 +27,53 @@ class TescoFragment : Fragment() {
     private var foodSections : List<FoodSection> = emptyList()
     private var amSubscribed : Boolean = false
     private var pageLoaded : Boolean = false
-    private var LOG_TAG = "TescoFragment"
-    private val tesco_url = "https://www.tesco.com/groceries/en-GB/products/256174499"
+    private val LOGTAG = "ShopWebsiteFragment"
+    private var website_url = "https://www.tesco.com/groceries/en-GB/products/256174499"
+    private var js_resource = R.raw.tesco
+    private val args: ShopWebsiteFragmentArgs by navArgs()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentSecondBinding.inflate(inflater, container, false)
+
+        val website = args.website
+        if (website == "tesco") {
+            website_url = "https://www.tesco.com/groceries/en-GB/products/256174499"
+            js_resource = R.raw.tesco
+        } else if(website == "sainsburys") {
+            website_url = "https://www.sainsburys.co.uk/gol-ui/product/hovis-seed-sensations-7-seeds-bread-800g"
+            js_resource = R.raw.sainsburys
+        } else if(website == "asda") {
+            website_url = "https://groceries.asda.com/product/white-bread/hovis-medium-soft-white-bread/29805"
+            js_resource = R.raw.asda
+        } else if(website == "boots") {
+            website_url = "https://www.boots.com/"
+            js_resource = R.raw.boots
+        } else if(website == "milkandmore") {
+            website_url = "https://www.milkandmore.co.uk/Bakery/Hovis-Original-Granary-Loaf%2C-800g/p/74862"
+            js_resource = R.raw.milkandmore
+        } else {
+            assert(false)
+        }
+
         return binding.root
 
     }
 
-    private fun dump_foods_to_json(foods : List<Food>, url: String): String {
-        var response_json = ""
+    private fun dumpFoodsToJson(foods : List<Food>, url: String): String {
+        var responseJson = ""
         for ((index, food) in foods.withIndex()) {
             if(index>0) {
-                response_json += ","
+                responseJson += ","
             }
-            response_json += "{"
-            response_json += "\"title\":\"${food.title}\","
-            response_json += "\"link\":\"https://www.ethicalconsumer.org${url}#score-table\""
-            response_json += "}\n"
+            responseJson += "{"
+            responseJson += "\"title\":\"${food.title}\","
+            responseJson += "\"link\":\"https://www.ethicalconsumer.org${url}#score-table\""
+            responseJson += "}\n"
         }
-        return response_json
+        return responseJson
     }
 
     private fun generate_js() : String
@@ -78,36 +99,36 @@ class TescoFragment : Fragment() {
                         "link": "https://www.ethicalconsumer.org/food-drink/shopping-guide/baked-beans#score-table"
                     },
                     */
-        var response_json = "{\"scores\":{"
+        var responseJson = "{\"scores\":{"
 
         for ((index, section) in foodSections.withIndex()) {
             if(index>0) {
-                response_json += ","
+                responseJson += ","
             }
-            response_json += "\"${section.location}\":{"
-            response_json += "\"title\":\"${section.title}\","
-            response_json += "\"table\":{"
-            response_json += "\"good\":[\n"
-            response_json += dump_foods_to_json(section.good_foods,section.location)
-            response_json += "],"
-            response_json += "\"average\":[\n"
-            response_json += dump_foods_to_json(section.average_foods,section.location)
-            response_json += "],"
-            response_json += "\"bad\":[\n"
-            response_json += dump_foods_to_json(section.bad_foods,section.location)
-            response_json += "]\n"
-            response_json += "}\n"
-            response_json += "}\n"
+            responseJson += "\"${section.location}\":{"
+            responseJson += "\"title\":\"${section.title}\","
+            responseJson += "\"table\":{"
+            responseJson += "\"good\":[\n"
+            responseJson += dumpFoodsToJson(section.good_foods,section.location)
+            responseJson += "],"
+            responseJson += "\"average\":[\n"
+            responseJson += dumpFoodsToJson(section.average_foods,section.location)
+            responseJson += "],"
+            responseJson += "\"bad\":[\n"
+            responseJson += dumpFoodsToJson(section.bad_foods,section.location)
+            responseJson += "]\n"
+            responseJson += "}\n"
+            responseJson += "}\n"
         }
-        response_json += "  }\n,\"subscription\":$amSubscribed }"
+        responseJson += "  }\n,\"subscription\":$amSubscribed }"
 
         // TODO pre_process_food only once on page load rather than every 30s in get_score_tables
-        val get_scores =
+        val getScores =
             """
 function get_score_tables() {
-    console.log("AMY getting scores");
+    console.log("get_score_tables");
     const response_json = `
-    $response_json
+    $responseJson
     `
     console.log("made json string");
     const response = JSON.parse(response_json);
@@ -129,32 +150,32 @@ function get_score_tables() {
     colour_page(response);
     return;
 }
-console.log("Amy rules");
+console.log("got score tables");
 """
 
-        // read in the common js and the tesco js, blat them together, add the ratings info
-        val in_s: InputStream = resources.openRawResource(R.raw.common)
-        val common = in_s.bufferedReader().use(BufferedReader::readText)
-        val tesco_s: InputStream = resources.openRawResource(R.raw.tesco)
-        val tesco = tesco_s.bufferedReader().use(BufferedReader::readText)
-        val matchy_s: InputStream = resources.openRawResource(R.raw.matchymcmatchypants)
-        val matchy = matchy_s.bufferedReader().use(BufferedReader::readText)
+        // read in the common js and the tesco/sainsburys/ocado/... js, blat them together, add the ratings info
+        val inputStream: InputStream = resources.openRawResource(R.raw.common)
+        val common = inputStream.bufferedReader().use(BufferedReader::readText)
+        val websiteStream: InputStream = resources.openRawResource(js_resource)
+        val website = websiteStream.bufferedReader().use(BufferedReader::readText)
+        val matchyStream: InputStream = resources.openRawResource(R.raw.matchymcmatchypants)
+        val matchy = matchyStream.bufferedReader().use(BufferedReader::readText)
 
-        println(matchy + "\n" + tesco + "\n" + common + "\n" + get_scores)
+        println(matchy + "\n" + website + "\n" + common + "\n" + getScores)
 
-        return matchy + "\n" + tesco + "\n" + common + "\n" + get_scores
+        return matchy + "\n" + website + "\n" + common + "\n" + getScores
     }
 
     // call this when the page loads, and also when we get progress on the foodsections,
     // when both are ready it will inject js into the webview
     private fun injectJsIfReady() {
         if(foodSections.isEmpty()) {
-            Log.d(LOG_TAG, "No food sections so can't inject JS")
+            Log.d(LOGTAG, "No food sections so can't inject JS")
             return
         }
 
         if(!pageLoaded) {
-            Log.d(LOG_TAG, "Page not loaded so can't inject JS")
+            Log.d(LOGTAG, "Page not loaded so can't inject JS")
             return
         }
 
@@ -171,7 +192,7 @@ console.log("Amy rules");
     }
 
     private fun scoresProgressCallback(progress: Int, subscribed: Boolean, foodsections: List<FoodSection>) {
-        amSubscribed = subscribed;
+        amSubscribed = subscribed
         if(progress == 100) {
             // use the data!
             foodSections = foodsections
@@ -190,19 +211,19 @@ console.log("Amy rules");
         //    findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         //}
 
-        binding.webview.getSettings().setJavaScriptEnabled(true);
-        binding.webview.loadUrl(tesco_url)
+        binding.webview.getSettings().setJavaScriptEnabled(true)
+        binding.webview.loadUrl(website_url)
 
         binding.webview.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(message: ConsoleMessage): Boolean {
-                Log.d(LOG_TAG, "${message.message()} -- From line " +
+                Log.d(LOGTAG, "${message.message()} -- From line " +
                         "${message.lineNumber()} of ${message.sourceId()}")
                 return true
             }
 
             override fun onProgressChanged (view: WebView, newProgress: Int) {
                 super.onProgressChanged(view, newProgress)
-                Log.d(LOG_TAG, "Page loading "+newProgress)
+                Log.d(LOGTAG, "Page loading "+newProgress)
                 if(newProgress != 100 || pageLoaded) {
                     return
                 }
@@ -210,7 +231,7 @@ console.log("Amy rules");
 
                 // Page loading finished
                 // Display the loaded page title in a toast message
-                Log.d(LOG_TAG,"Page loaded: ${view.title}")
+                Log.d(LOGTAG,"Page loaded: ${view.title}")
 
                 // Enable disable back forward button
                 //button_back.isEnabled = web_view.canGoBack()

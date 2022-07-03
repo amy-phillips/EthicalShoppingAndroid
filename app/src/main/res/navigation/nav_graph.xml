@@ -12,21 +12,57 @@
         tools:layout="@layout/fragment_first">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_FirstFragment_to_Tesco"
+            app:destination="@id/SecondFragment" >
+            <argument
+                android:name="website"
+                android:defaultValue="tesco" />
+        </action>
         <action
             android:id="@+id/action_FirstFragment_to_ethicalConsumerFragment"
             app:destination="@id/ethicalConsumerFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_Sainsburys"
+            app:destination="@id/SecondFragment" >
+            <argument
+                android:name="website"
+                android:defaultValue="sainsburys" />
+        </action>
+        <action
+            android:id="@+id/action_FirstFragment_to_Asda"
+            app:destination="@id/SecondFragment">
+            <argument
+                android:name="website"
+                android:defaultValue="asda" />
+        </action>
+        <action
+            android:id="@+id/action_FirstFragment_to_Boots"
+            app:destination="@id/SecondFragment">
+            <argument
+                android:name="website"
+                android:defaultValue="boots" />
+        </action>
+        <action
+            android:id="@+id/action_FirstFragment_to_MilkAndMore"
+            app:destination="@id/SecondFragment">
+            <argument
+                android:name="website"
+                android:defaultValue="milkandmore" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="uk.co.islovely.ethicalshopping.TescoFragment"
+        android:name="uk.co.islovely.ethicalshopping.ShopWebsiteFragment"
         android:label="@string/tesco_fragment_label"
         tools:layout="@layout/fragment_second">
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
+        <argument
+            android:name="website"
+            app:argType="string"
+            android:defaultValue="tesco" />
     </fragment>
     <fragment
         android:id="@+id/ethicalConsumerFragment"

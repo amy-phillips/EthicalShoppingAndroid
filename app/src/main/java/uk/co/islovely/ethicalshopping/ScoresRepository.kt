@@ -7,7 +7,7 @@ import javax.net.ssl.HttpsURLConnection
 
 // ScoresRepository is consumed from other layers of the hierarchy.
 object ScoresRepository {
-    private val LOGTAG = "ScoresRepository"
+    private const val LOGTAG = "ScoresRepository"
 
     private var foodSections = mutableListOf<FoodSection>()
     private var wasSubscribed = false
@@ -45,41 +45,41 @@ object ScoresRepository {
     {
         // TODO
         // return new DOMParser().parseFromString(string,'text/html').querySelector('html').textContent;
-        return string;
+        return string
     }
 
     private fun fixupOverlyShortTitles(title: String) : String
     {
         if(title=="Crunchie") {
-            return "Cadbury's Crunchie";
+            return "Cadbury's Crunchie"
         } else if(title=="Double Decker") {
-            return "Cadbury's Double Decker";
+            return "Cadbury's Double Decker"
         } else if(title=="Eclairs") {
-            return "Cadbury's Eclairs";
+            return "Cadbury's Eclairs"
         } else if(title=="Flake") {
-            return "Cadbury's Flake";
+            return "Cadbury's Flake"
         } else if(title=="Fudge") {
-            return "Cadbury's Fudge";
+            return "Cadbury's Fudge"
         } else if(title=="Heroes") {
-            return "Cadbury's Heroes";
+            return "Cadbury's Heroes"
         } else if(title=="Picnic") {
-            return "Cadbury's Picnic";
+            return "Cadbury's Picnic"
         } else if(title=="Time Out") {
-            return "Cadbury's Timeout";
+            return "Cadbury's Timeout"
         } else if(title=="Twirl") {
-            return "Cadbury's Twirl";
+            return "Cadbury's Twirl"
         } else if(title=="Wispa") {
-            return "Cadbury's Wispa";
+            return "Cadbury's Wispa"
         } else if(title=="Fab") {
-            return "Nestle Fab";
+            return "Nestle Fab"
         } else if(title=="Zingers") {
-            return "James White Zingers";
+            return "James White Zingers"
         }
 
         if(title.indexOf(' ')<0) {
-            Log.d(LOGTAG, "Short title: "+title);
+            Log.d(LOGTAG, "Short title: "+title)
         }
-        return title;
+        return title
     }
 
     private fun addAnyNewFoodSection(new_food : FoodSection) {
@@ -103,56 +103,55 @@ object ScoresRepository {
     private fun getScoreTables() {
         progressCallback?.invoke(0, false, emptyList())
 
-        val url = URL("https://www.ethicalconsumer.org/")
-        val urlConnection = url.openConnection() as HttpsURLConnection
+        val ecUrl = URL("https://www.ethicalconsumer.org/")
+        val ecUrlConnection = ecUrl.openConnection() as HttpsURLConnection
         // if the player has signed in in the EC webview, this will have set a cookie,
         // grab the cookies, so we will get the signed in version of the website
-        var cookies = CookieManager.getInstance().getCookie("https://www.ethicalconsumer.org/")
-        if (cookies != null) {
-            urlConnection.setRequestProperty("Cookie", cookies);
+        val ecCookies = CookieManager.getInstance().getCookie("https://www.ethicalconsumer.org/")
+        if (ecCookies != null) {
+            ecUrlConnection.setRequestProperty("Cookie", ecCookies)
         }
 
         try {
-            val data = urlConnection.inputStream.bufferedReader().readText()
-            urlConnection.inputStream.close()
-            urlConnection.disconnect()
+            val ecData = ecUrlConnection.inputStream.bufferedReader().readText()
+            ecUrlConnection.inputStream.close()
+            ecUrlConnection.disconnect()
             // is there a call to action to subscribe?
-            var subscribe="";
-            var sub = Regex("<button[^>]*?value=\"Sign in \">")
-            var am_subscribed = !sub.containsMatchIn(data)
+            val sub = Regex("<button[^>]*?value=\"Sign in \">")
+            val am_subscribed = !sub.containsMatchIn(ecData)
             // let UI know if we're subscribed/logged in
             progressCallback?.invoke(1, am_subscribed, emptyList())
 
             // parse out product guides - food and drink
-            addAnyNewFoodSections(parseProductGuides("<a class=\"more\" href=\"/food-drink\">Food &amp; Drink guides, news and features</a>",data));
+            addAnyNewFoodSections(parseProductGuides("<a class=\"more\" href=\"/food-drink\">Food &amp; Drink guides, news and features</a>",ecData))
             //health and beauty
-            addAnyNewFoodSections(parseProductGuides("<a class=\"more\" href=\"/health-beauty\">Health &amp; Beauty guides, news and features</a>",data));
+            addAnyNewFoodSections(parseProductGuides("<a class=\"more\" href=\"/health-beauty\">Health &amp; Beauty guides, news and features</a>",ecData))
 
             // some more products that are stocked by supermarkets - don;t want all of home and garden tho
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/dishwasher-detergent"));
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/household-cleaners"));
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/laundry-detergents"));
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/toilet-cleaners"));
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/toilet-paper"));
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/washing-liquid"));
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/dishwasher-detergent"))
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/household-cleaners"))
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/laundry-detergents"))
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/toilet-cleaners"))
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/toilet-paper"))
+            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/washing-liquid"))
 
             // strip out perfume shops because it has short names and doesn't help
-            foodSections.remove(FoodSection("/health-beauty/shopping-guide/perfume-shops"));
+            foodSections.remove(FoodSection("/health-beauty/shopping-guide/perfume-shops"))
 
             // are there any cached entries that we want to throw away?
             if(am_subscribed!=wasSubscribed) {
                 for (fs in foodSections) {
-                    Log.d(LOGTAG,"Will rerequest $fs because subscription check change");
-                    fs.last_success=0;
-                    continue;
+                    Log.d(LOGTAG,"Will rerequest $fs because subscription check change")
+                    fs.last_success=0
+                    continue
                 }
             }
-            wasSubscribed=am_subscribed;
+            wasSubscribed=am_subscribed
 
             // request all the pages - eventually parallelise this
             for (fs in foodSections) {
-                var index = foodSections.indexOf(fs)
-                var progress: Float = 100.0f*index.toFloat()/foodSections.size.toFloat()
+                val index = foodSections.indexOf(fs)
+                val progress: Float = 100.0f*index.toFloat()/foodSections.size.toFloat()
                 Log.d(LOGTAG, "Progress $index / ${foodSections.size}")
                 progressCallback?.invoke(progress.toInt(), am_subscribed, foodSections)
                 val REFRESH_MILLIS : Long = 5*60*1000
@@ -169,7 +168,7 @@ object ScoresRepository {
 
                 val url = URL("https://www.ethicalconsumer.org" + fs.location)
                 val urlConnection = url.openConnection() as HttpsURLConnection
-                var cookies =
+                val cookies =
                     CookieManager.getInstance().getCookie("https://www.ethicalconsumer.org/")
                 if (cookies != null) {
                     urlConnection.setRequestProperty("Cookie", cookies)
@@ -178,15 +177,15 @@ object ScoresRepository {
                 val data = urlConnection.inputStream.bufferedReader().readText()
                 urlConnection.inputStream.close()
                 urlConnection.disconnect()
-                var titleregex = Regex("<h1 class=\"title\">\\s*([\\w\\s&;,-]+?)[\\s]*<")
-                var titlematch = titleregex.find(data)
+                val titleregex = Regex("<h1 class=\"title\">\\s*([\\w\\s&;,-]+?)[\\s]*<")
+                val titlematch = titleregex.find(data)
                 fs.title = unescape(titlematch?.groupValues?.get(1) ?: "error")
 
                 // parse the score table
-                var tableregex = Regex("<table class=\"table\"(.*?)<\\/table>", RegexOption.DOT_MATCHES_ALL) //gms.exec(data);
-                var tablematch = tableregex.find(data)
-                var tabledata = tablematch?.groupValues?.get(1)
-                var tableentryregex = Regex(
+                val tableregex = Regex("<table class=\"table\"(.*?)<\\/table>", RegexOption.DOT_MATCHES_ALL) //gms.exec(data);
+                val tablematch = tableregex.find(data)
+                val tabledata = tablematch?.groupValues?.get(1)
+                val tableentryregex = Regex(
                     "<h4>([^<]*)<\\/h4>(?:.*?)?<div class=\"score (\\w+)\">",
                     RegexOption.DOT_MATCHES_ALL
                 ) //gms;
@@ -195,8 +194,8 @@ object ScoresRepository {
                     while (tableentry != null)
                     {
                         try {
-                            var rating=Rating.valueOf(tableentry.groupValues.get(2).uppercase())
-                            var title=fixupOverlyShortTitles(unescape(tableentry.groupValues.get(1))); // flake matches too many things - hack it!
+                            val rating=Rating.valueOf(tableentry.groupValues.get(2).uppercase())
+                            val title=fixupOverlyShortTitles(unescape(tableentry.groupValues.get(1))) // flake matches too many things - hack it!
                             var food_list: MutableList<Food>? = null
                             if(rating==Rating.GOOD) {
                                 food_list = fs.good_foods
@@ -209,7 +208,7 @@ object ScoresRepository {
                                 continue
                             }
 
-                            food_list.add(Food(title, rating, "https://www.ethicalconsumer.org${fs.location}#score-table"));
+                            food_list.add(Food(title, rating, "https://www.ethicalconsumer.org${fs.location}#score-table"))
                         } catch (e: Exception) {
                             Log.d(LOGTAG, "Failed to parse rating $e")
                         }
@@ -229,20 +228,20 @@ object ScoresRepository {
     }
 
     private fun parseProductGuides(product_selector: String, page_html: String) : MutableList<FoodSection> {
-        var foods=mutableListOf<FoodSection>();
+        var foods=mutableListOf<FoodSection>()
 
-        var list_selection_regex = Regex(product_selector+".*?<h4>Product Guides</h4>.*?<ul>(.*?)</ul>",setOf(
+        val list_selection_regex = Regex(product_selector+".*?<h4>Product Guides</h4>.*?<ul>(.*?)</ul>",setOf(
             RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL
-        ));
+        ))
         val product_list_result = list_selection_regex.find(page_html)
 
         // then split into each entry (can I do that in regex above? - can't figure it out so KISS)
-        var li_regex = Regex("<a href=\"([^\"]+)",RegexOption.MULTILINE);
+        val li_regex = Regex("<a href=\"([^\"]+)",RegexOption.MULTILINE)
         val product_matches = li_regex.findAll(product_list_result?.value.orEmpty())
         for(product in product_matches) {
-            foods.add(FoodSection(product.groupValues?.get(1)));
+            foods.add(FoodSection(product.groupValues.get(1)))
         }
 
-        return foods;
+        return foods
     }
 }
