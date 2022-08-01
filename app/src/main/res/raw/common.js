@@ -8,7 +8,7 @@ const DEBUG_COLOUR='#FFFF00';
 // 0 for no extra debug
 // 1 to colour the background of every product considered
 // 2 for more details about why a product doesn't match
-const DEBUGGING=1;
+const DEBUGGING=0;
 
 function get_best_match(munged_tables, raw_product_name) {
     // strip off (2 pint)
