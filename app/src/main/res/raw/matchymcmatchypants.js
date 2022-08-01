@@ -138,8 +138,8 @@ function pre_process_food(name) {
     singles.delete('free');
     singles.delete('and');
 
-    console.log(name + " ("+processed+") becomes:");
-    console.log(Array.from(singles).join(', '));
+    //console.log(name + " ("+processed+") becomes:");
+    //console.log(Array.from(singles).join(', '));
     // we want at least one of these words to match in food description, but don't require them all
     return {"name":name,"all_of":[],"one_of":Array.from(singles)};
 }
@@ -211,9 +211,9 @@ function pre_process(name,pre_processed_food=null) {
         singles.forEach(one_of.delete, one_of);
     }
 
-    console.log(name + " ("+processed+") becomes:");
-    console.log(Array.from(singles).join(', '));
-    console.log(Array.from(one_of).join(', '));
+    //console.log(name + " ("+processed+") becomes:");
+    //console.log(Array.from(singles).join(', '));
+    //console.log(Array.from(one_of).join(', '));
     // if this was in a well-named section on ethical consumer, add that too
     return {"name":name,"one_of":Array.from(one_of),"all_of":Array.from(singles)};
 }
