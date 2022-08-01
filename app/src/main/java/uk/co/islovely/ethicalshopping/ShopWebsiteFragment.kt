@@ -42,19 +42,19 @@ class ShopWebsiteFragment : Fragment() {
 
         val website = args.website
         if (website == "tesco") {
-            website_url = "https://www.tesco.com/groceries/en-GB/products/256174499"
+            website_url = "https://www.tesco.com/groceries"
             js_resource = R.raw.tesco
         } else if(website == "sainsburys") {
-            website_url = "https://www.sainsburys.co.uk"
+            website_url = "https://www.sainsburys.co.uk/shop/gb/groceries"
             js_resource = R.raw.sainsburys
         } else if(website == "asda") {
-            website_url = "https://groceries.asda.com/product/white-bread/hovis-medium-soft-white-bread/29805"
+            website_url = "https://groceries.asda.com"
             js_resource = R.raw.asda
         } else if(website == "boots") {
-            website_url = "https://www.boots.com/"
+            website_url = "https://www.boots.com"
             js_resource = R.raw.boots
         } else if(website == "milkandmore") {
-            website_url = "https://www.milkandmore.co.uk/Bakery/Hovis-Original-Granary-Loaf%2C-800g/p/74862"
+            website_url = "https://www.milkandmore.co.uk"
             js_resource = R.raw.milkandmore
         } else {
             assert(false)
@@ -125,6 +125,7 @@ class ShopWebsiteFragment : Fragment() {
         responseJson += "  }\n,\"subscription\":$amSubscribed }"
 
         // TODO pre_process_food only once on page load rather than every 30s in get_score_tables
+
         val getScores =
             """
 function get_score_tables() {
@@ -148,11 +149,9 @@ function get_score_tables() {
             food['preprocessed_title']=pre_process(food.title,processed_food);
         }
     }
-    display_call_to_login_if_necessary(response);
     colour_page(response);
     return;
 }
-console.log("got score tables");
 """
 
         // read in the common js and the tesco/sainsburys/ocado/... js, blat them together, add the ratings info

@@ -53,77 +53,6 @@ function get_munged_tables(response) {
     return munged_tables;
 }
 
-function display_call_to_login_if_necessary(response) {
-    subscribe_fors=[];
-    subscribe_link=null;
-    if(response.subscription) {
-        subscribe_link=response.subscription;
-        // grab the titles of all the foods with an empty recommendations table (these will be the ones you gain if you subscribe)
-        for (let value of Object.values(response.scores)) {
-            if(value.table.good.length==0 && value.table.average.length==0 && value.table.bad.length==0) {
-                if(value.title) {
-                    subscribe_fors.push(value.title);
-                }
-            }
-        }
-    }
-    
-    const esCallToLogin = document.querySelector("#es-call_to_login");
-
-    if(subscribe_link && !esCallToLogin) {
-        // add a button to link to ethical consumer site for login/subscribe
-        var top_bar=document.createElement('table');
-        top_bar.className="es-login_or_subscribe-block";
-        top_bar.id='es-call_to_login';
-
-        var row = top_bar.insertRow(0);
-
-        var cell1 = row.insertCell(0);
-        cell1.setAttribute("width", "40px");
-        //cell1.setAttribute("border", "0 !important");
-
-        var imglink = document.createElement('a');
-        imglink.href = "https://www.ethicalconsumer.org";
-        imglink.setAttribute('target','_blank');
-
-        var img=document.createElement('img');
-        img.setAttribute("src", chrome.extension.getURL("images/icon32.png"));
-        img.setAttribute("alt", "Ethical Shopping Helper Logo");
-        img.className = "es-img-32"
-        imglink.appendChild(img);
-
-        cell1.appendChild(imglink);
-        cell1.className = "es-login_or_subscribe-td";
-
-        var cell2 = row.insertCell(1);
-        cell2.className = "es-login_or_subscribe-td";
-        cell2.setAttribute("width", "100%"); // this pushes cell3 to the right of the screen
-        //cell2.setAttribute("border","0 !important");
-
-        var linky_p = document.createElement('p');
-        var last=subscribe_fors.pop();
-        var subscr_fors_str=subscribe_fors.join(", ")+" and "+last;
-        linky_p.innerHTML = "Please <a href=\"https://www.ethicalconsumer.org\" target=\"_blank\">sign in</a> or <a href=\""+subscribe_link+"\" target=\"_blank\">subscribe</a> to Ethical Consumer so I can highlight more products for you from categories such as "+subscr_fors_str;
-        linky_p.className = "es-login_or_subscribe-p";
-        cell2.appendChild(linky_p);
-
-        var cell3 = row.insertCell(2);
-        cell3.className = "es-login_or_subscribe-td";
-        cell3.setAttribute("width", "100px");
-        //cell3.setAttribute("border","0 !important");
-        var goaway_linky = document.createElement('p');
-        goaway_linky.innerHTML = "<a href=\"javascript:void(0);\">Login Later</a>";
-        goaway_linky.onclick = go_away;
-        goaway_linky.className = "es-login_or_subscribe-p";
-        cell3.appendChild(goaway_linky);
-
-        get_header_location().append(top_bar); // put it on end of body, but css positions it at top of page
-    } else if(subscribe_link==null && esCallToLogin) {
-        // remove the prompt button - they logged in!
-        esCallToLogin.parentNode.removeChild(esCallToLogin);
-    }
-}
-
 function apply_colour(product_div,colour_div,css_class,short_text,best_match) {
     console.log("apply_colour: "+best_match)
     colour_div.style.backgroundColor = best_match.colour;
@@ -182,26 +111,6 @@ function colour_product(munged_tables,product_div,colour_div,css_class,short_tex
         best_match.colour=DEBUG_COLOUR;
         apply_colour(product_div,colour_div,css_class,short_text,best_match);
     }
-}   
-
-
-function go_away() {
-/*
-    chrome.runtime.sendMessage({command: "go_away"}, function(response) {
-        if(response.error) {
-            console.log(response.error);
-            console.log(response.data);
-            return;
-        }
-
-        console.log(response);
-        display_call_to_login_if_necessary(response);
-
-        colour_page(response);
-        return;
-
-      });
-*/
 }
 
 // if you search on ocado or tesco it changes the url without a reload
