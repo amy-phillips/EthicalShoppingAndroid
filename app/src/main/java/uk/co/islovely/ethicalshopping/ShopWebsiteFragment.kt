@@ -1,18 +1,20 @@
 package uk.co.islovely.ethicalshopping
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.ConsoleMessage
-import android.webkit.WebChromeClient
-import android.webkit.WebView
+import android.webkit.*
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import uk.co.islovely.ethicalshopping.databinding.FragmentSecondBinding
 import java.io.BufferedReader
 import java.io.InputStream
+
 
 /**
  * This fragment displays the website for eg Tesco/Sainsburys, and then pokes in the javascript to highlight it
@@ -43,7 +45,7 @@ class ShopWebsiteFragment : Fragment() {
             website_url = "https://www.tesco.com/groceries/en-GB/products/256174499"
             js_resource = R.raw.tesco
         } else if(website == "sainsburys") {
-            website_url = "https://www.sainsburys.co.uk/gol-ui/product/hovis-seed-sensations-7-seeds-bread-800g"
+            website_url = "https://www.sainsburys.co.uk"
             js_resource = R.raw.sainsburys
         } else if(website == "asda") {
             website_url = "https://groceries.asda.com/product/white-bread/hovis-medium-soft-white-bread/29805"
@@ -161,7 +163,7 @@ console.log("got score tables");
         val matchyStream: InputStream = resources.openRawResource(R.raw.matchymcmatchypants)
         val matchy = matchyStream.bufferedReader().use(BufferedReader::readText)
 
-        println(matchy + "\n" + website + "\n" + common + "\n" + getScores)
+        //println(matchy + "\n" + website + "\n" + common + "\n" + getScores)
 
         return matchy + "\n" + website + "\n" + common + "\n" + getScores
     }
@@ -207,14 +209,53 @@ console.log("got score tables");
         // kick off getting score tables
         ScoresRepository.startGettingScores(::scoresProgressCallback)
 
+        (activity as AppCompatActivity?)!!.supportActionBar!!.setTitle("Home")
+
         //binding.buttonSecond.setOnClickListener {
         //    findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         //}
+        binding.webview.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                if (url != null) {
+                    pageLoaded = false
+                    binding.webview.loadUrl(url)
+                }
+                return false
+            }
 
-        binding.webview.getSettings().setJavaScriptEnabled(true)
-        binding.webview.loadUrl(website_url)
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest
+            ): Boolean {
+                pageLoaded = false
+                binding.webview.loadUrl(request.url.toString())
+                return false
+            }
 
+
+            /*
+            override fun onPageFinished(view: WebView, url: String) {
+                pageLoaded = true
+
+                // Page loading finished
+                // Display the loaded page title in a toast message
+                Log.d(LOGTAG,"webview Page loaded: ${view.title}")
+
+                // Enable disable back forward button
+                //button_back.isEnabled = web_view.canGoBack()
+                //button_forward.isEnabled = web_view.canGoForward()
+
+                injectJsIfReady()
+            }
+            */
+
+        }
         binding.webview.webChromeClient = object : WebChromeClient() {
+            override fun onReceivedTitle(view: WebView?, title: String?) {
+                (activity as AppCompatActivity?)!!.supportActionBar!!.setTitle(title)
+            }
+
             override fun onConsoleMessage(message: ConsoleMessage): Boolean {
                 Log.d(LOGTAG, "${message.message()} -- From line " +
                         "${message.lineNumber()} of ${message.sourceId()}")
@@ -240,6 +281,12 @@ console.log("got score tables");
                 injectJsIfReady()
             }
         }
+
+        binding.webview.getSettings().setJavaScriptEnabled(true)
+        binding.webview.getSettings().setSupportMultipleWindows(true); // This forces ChromeClient enabled.
+        binding.webview.getSettings().setDomStorageEnabled(true);
+        pageLoaded = false
+        binding.webview.loadUrl(website_url)
     }
 
     override fun onDestroyView() {
