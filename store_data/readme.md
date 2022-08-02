@@ -1,0 +1,1 @@
+This is just a place to store resources used in the android app store - these are not needed to build the app
