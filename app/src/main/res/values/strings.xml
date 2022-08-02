@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WebviewTest</string>
+    <string name="app_name">Ethical Shopping</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">Choose Shop</string>
