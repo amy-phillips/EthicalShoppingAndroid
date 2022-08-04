@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -78,7 +80,7 @@ class ShopWebsiteFragment : Fragment() {
         return responseJson
     }
 
-    private fun generate_js() : String
+    private fun generateJS() : String
     {
         // generate the get_score_tables function
         // response={"scores":gScoreTables,"subscription":subscription_to_send};
@@ -180,15 +182,11 @@ function get_score_tables() {
             return
         }
 
-        val js = generate_js()
+        val js = generateJS()
         activity?.runOnUiThread(java.lang.Runnable {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                binding.webview.evaluateJavascript(
-                    js,
-                    null)
-            } else {
-                binding.webview.loadUrl("javascript:"+js)
-            }
+            binding.webview.evaluateJavascript(
+                js,
+                null)
         })
     }
 
@@ -197,8 +195,30 @@ function get_score_tables() {
         if(progress == 100) {
             // use the data!
             foodSections = foodsections
-
             injectJsIfReady()
+
+            // TODO progress bar update code should not be duplicated
+            activity?.runOnUiThread(java.lang.Runnable {
+                try {
+                    val progressLayout: LinearLayout = requireActivity().findViewById(R.id.downloadprogress_layout)
+                    progressLayout.visibility = View.INVISIBLE
+                } catch (e: IllegalStateException) {
+                    // we probaly got cleaned up
+                }
+            })
+        } else {
+            activity?.runOnUiThread(java.lang.Runnable {
+                try {
+                    val progressLayout: LinearLayout =
+                        requireActivity().findViewById(R.id.downloadprogress_layout)
+                    progressLayout.visibility = View.VISIBLE
+                    val progressBar: ProgressBar =
+                        requireActivity().findViewById(R.id.downloadprogress_bar)
+                    progressBar.progress = progress
+                } catch (e: IllegalStateException) {
+                    // we probaly got cleaned up
+                }
+            })
         }
     }
 
@@ -281,9 +301,9 @@ function get_score_tables() {
             }
         }
 
-        binding.webview.getSettings().setJavaScriptEnabled(true)
-        binding.webview.getSettings().setSupportMultipleWindows(true); // This forces ChromeClient enabled.
-        binding.webview.getSettings().setDomStorageEnabled(true);
+        binding.webview.settings.setJavaScriptEnabled(true)
+        binding.webview.settings.setSupportMultipleWindows(true) // This forces ChromeClient enabled.
+        binding.webview.settings.setDomStorageEnabled(true)
         pageLoaded = false
         binding.webview.loadUrl(website_url)
     }

@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import uk.co.islovely.ethicalshopping.databinding.FragmentFirstBinding
@@ -34,12 +36,29 @@ class FirstFragment : Fragment() {
     }
 
     private fun scoresProgressCallback(progress: Int, subscribed: Boolean, foodSections: List<FoodSection>) {
-        activity?.runOnUiThread(java.lang.Runnable {
-            if(isAdded) {
-                binding.progressGetfoods.visibility = View.VISIBLE
-                binding.progressGetfoods.progress = progress
-            }
-        })
+        if(progress == 100) {
+            // TODO progress bar update code should not be duplicated
+            activity?.runOnUiThread(java.lang.Runnable {
+                try {
+                    val progressLayout: LinearLayout = requireActivity().findViewById(R.id.downloadprogress_layout)
+                    progressLayout.visibility = View.INVISIBLE
+                } catch (e: IllegalStateException) {
+                    // we probaly got cleaned up
+                }
+            })
+        } else {
+            activity?.runOnUiThread(java.lang.Runnable {
+                try {
+                    val progressLayout: LinearLayout = requireActivity().findViewById(R.id.downloadprogress_layout)
+                    progressLayout.visibility = View.VISIBLE
+                    val progressBar: ProgressBar = requireActivity().findViewById(R.id.downloadprogress_bar)
+                    progressBar.progress = progress
+                } catch (e: IllegalStateException) {
+                    // we probaly got cleaned up
+                }
+            })
+        }
+
         // if we just started then we have no data, so quit here
         if(progress==0)
             return
@@ -58,11 +77,7 @@ class FirstFragment : Fragment() {
                 }
             })
         }
-        if(progress == 100) {
-            if(isAdded) {
-                binding.progressGetfoods.visibility = View.INVISIBLE
-            }
-        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
