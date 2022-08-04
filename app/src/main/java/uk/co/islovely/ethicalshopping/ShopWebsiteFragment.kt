@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.webkit.*
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -225,6 +226,20 @@ function get_score_tables() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val callback: OnBackPressedCallback = object : OnBackPressedCallback(
+            true // default to enabled
+        ) {
+            override fun handleOnBackPressed() {
+                if (binding.webview.canGoBack()) {
+                    binding.webview.goBack()
+                }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,  // LifecycleOwner
+            callback
+        )
+
         // kick off getting score tables
         ScoresRepository.startGettingScores(::scoresProgressCallback)
 
@@ -251,23 +266,6 @@ function get_score_tables() {
                 binding.webview.loadUrl(request.url.toString())
                 return false
             }
-
-
-            /*
-            override fun onPageFinished(view: WebView, url: String) {
-                pageLoaded = true
-
-                // Page loading finished
-                // Display the loaded page title in a toast message
-                Log.d(LOGTAG,"webview Page loaded: ${view.title}")
-
-                // Enable disable back forward button
-                //button_back.isEnabled = web_view.canGoBack()
-                //button_forward.isEnabled = web_view.canGoForward()
-
-                injectJsIfReady()
-            }
-            */
 
         }
         binding.webview.webChromeClient = object : WebChromeClient() {

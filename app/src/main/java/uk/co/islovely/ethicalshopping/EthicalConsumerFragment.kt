@@ -10,6 +10,7 @@ import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import uk.co.islovely.ethicalshopping.databinding.FragmentSecondBinding
 
@@ -37,9 +38,19 @@ class EthicalConsumerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //binding.buttonSecond.setOnClickListener {
-        //    findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
-        //}
+        val callback: OnBackPressedCallback = object : OnBackPressedCallback(
+            true // default to enabled
+        ) {
+            override fun handleOnBackPressed() {
+                if (binding.webview.canGoBack()) {
+                    binding.webview.goBack()
+                }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,  // LifecycleOwner
+            callback
+        )
 
         binding.webview.getSettings().setJavaScriptEnabled(true);
         binding.webview.loadUrl("https://www.ethicalconsumer.org/")
