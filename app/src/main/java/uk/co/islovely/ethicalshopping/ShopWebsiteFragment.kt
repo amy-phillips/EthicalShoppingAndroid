@@ -18,6 +18,7 @@ import uk.co.islovely.ethicalshopping.databinding.FragmentSecondBinding
 import java.io.BufferedReader
 import java.io.InputStream
 
+//TODO fix the more details link to take you to ethical consumer
 
 /**
  * This fragment displays the website for eg Tesco/Sainsburys, and then pokes in the javascript to highlight it
@@ -74,7 +75,7 @@ class ShopWebsiteFragment : Fragment() {
                 responseJson += ","
             }
             responseJson += "{"
-            responseJson += "\"title\":\"${food.title}\","
+            responseJson += "\"title\":\"${food.title.replace("\"", "")}\","
             responseJson += "\"link\":\"https://www.ethicalconsumer.org${url}#score-table\""
             responseJson += "}\n"
         }
@@ -111,7 +112,7 @@ class ShopWebsiteFragment : Fragment() {
                 responseJson += ","
             }
             responseJson += "\"${section.location}\":{"
-            responseJson += "\"title\":\"${section.title}\","
+            responseJson += "\"title\":\"${section.title.replace("\"", "")}\","
             responseJson += "\"table\":{"
             responseJson += "\"good\":[\n"
             responseJson += dumpFoodsToJson(section.good_foods,section.location)
@@ -156,6 +157,14 @@ function get_score_tables() {
     return;
 }
 """
+        val debug_enum=2
+        val debugging = """
+            // set to 
+            // 0 for no extra debug
+            // 1 to colour the background of every product considered
+            // 2 for more details about why a product doesn't match
+            const DEBUGGING=$debug_enum;
+        """.trimIndent()
 
         // read in the common js and the tesco/sainsburys/ocado/... js, blat them together, add the ratings info
         val inputStream: InputStream = resources.openRawResource(R.raw.common)
@@ -167,7 +176,7 @@ function get_score_tables() {
 
         //println(matchy + "\n" + website + "\n" + common + "\n" + getScores)
 
-        return matchy + "\n" + website + "\n" + common + "\n" + getScores
+        return matchy + "\n" + website + "\n" + debugging + common + "\n" + getScores
     }
 
     // call this when the page loads, and also when we get progress on the foodsections,
