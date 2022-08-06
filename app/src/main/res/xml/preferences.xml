@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.CheckBoxPreference
+        android:defaultValue="false"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:key="settings_debug"
+        android:summary="@string/moreinfo_debugging"
+        android:title="@string/action_debugging" />
+
+    <androidx.preference.Preference
+        android:key="settings_feedback"
+        android:summary="@string/moreinfo_feedback"
+        android:title="@string/action_feedback" />
+</androidx.preference.PreferenceScreen>
