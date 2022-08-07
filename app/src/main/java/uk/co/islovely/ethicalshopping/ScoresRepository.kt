@@ -55,8 +55,6 @@ object ScoresRepository {
             val stringData = Html.fromHtml(string).toString();
             return stringData
         }
-
-        return ""
     }
 
     private fun fixupOverlyShortTitles(title: String) : String
