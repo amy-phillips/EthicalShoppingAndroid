@@ -17,6 +17,7 @@ import androidx.navigation.fragment.navArgs
 import uk.co.islovely.ethicalshopping.databinding.FragmentSecondBinding
 import java.io.BufferedReader
 import java.io.InputStream
+import java.lang.Deprecated
 
 //TODO fix the more details link to take you to ethical consumer
 
@@ -258,6 +259,7 @@ function get_score_tables() {
         //    findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         //}
         binding.webview.webViewClient = object : WebViewClient() {
+            @Deprecated
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                 if (url != null) {
                     pageLoaded = false
