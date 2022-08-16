@@ -1,5 +1,7 @@
 package uk.co.islovely.ethicalshopping
 
+import android.os.Build
+import android.text.Html
 import android.util.Log
 import android.webkit.CookieManager
 import java.net.URL
@@ -43,9 +45,16 @@ object ScoresRepository {
 
     private fun unescape(string: String) : String
     {
-        // TODO
         // return new DOMParser().parseFromString(string,'text/html').querySelector('html').textContent;
-        return string
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // FROM_HTML_MODE_LEGACY is the behaviour that was used for versions below android N
+            // we are using this flag to give a consistent behaviour
+            val stringData = Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY).toString();
+            return stringData
+        } else {
+            val stringData = Html.fromHtml(string).toString();
+            return stringData
+        }
     }
 
     private fun fixupOverlyShortTitles(title: String) : String

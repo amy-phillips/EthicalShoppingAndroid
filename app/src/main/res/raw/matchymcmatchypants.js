@@ -123,6 +123,7 @@ function pre_process_food(name) {
  
     processed=name.replace('&',' ');
     processed=processed.replace(/\-/gi,' '); //washing-up should become washing up, rather than washingup
+    processed=processed.replace(/spreads/gi,'butter');
 
     var plurals = processed.toLowerCase().split(/\s+/);
     var singles=new Set(); // no dups plz
@@ -158,7 +159,7 @@ function pre_process(name,pre_processed_food=null) {
     processed=processed.replace(/washing (powder|gel|liquid|capsules)/gi,'laundry detergent');
     processed=processed.replace(/laundry liquid/gi,'laundry detergent');
     processed=processed.replace(/washing powder and liquid/gi,'laundry detergent');
-    processed=processed.replace(/dishwasher (powder|tablets)/gi,'dishwasher detergent');
+    processed=processed.replace(/dishwasher (powder|tablets|tabs)/gi,'dishwasher detergent');
     // the type of squash doesn't match for Rocks so remove the flavour
     processed=processed.replace(/(blackcurrant|orange) squash/gi,'squash');
     // the flavour of bio-d washing up liquid doesn't matter either
@@ -176,6 +177,8 @@ function pre_process(name,pre_processed_food=null) {
     processed=processed.replace(/lollies/gi,'ice cream');
     // Good earth teabags - let's say teabags are just tea
     processed=processed.replace(/teabags/gi,'tea');
+    // the butter and spreads section is annoying - pretend they're all butter
+    processed=processed.replace(/spread/gi,'butter');
     processed=processed.trim();
    
     // split into words, make all lowercase, and not plural
