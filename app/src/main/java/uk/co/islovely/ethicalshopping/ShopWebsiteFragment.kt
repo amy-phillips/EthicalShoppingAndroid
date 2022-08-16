@@ -258,11 +258,8 @@ function get_score_tables() {
         // kick off getting score tables
         ScoresRepository.startGettingScores(::scoresProgressCallback)
 
-        (activity as AppCompatActivity?)!!.supportActionBar!!.setTitle("Home")
+        //(activity as AppCompatActivity?)!!.supportActionBar!!.setTitle("Home")
 
-        //binding.buttonSecond.setOnClickListener {
-        //    findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
-        //}
         binding.webview.webViewClient = object : WebViewClient() {
             @Deprecated
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
@@ -318,6 +315,7 @@ function get_score_tables() {
         binding.webview.settings.setJavaScriptEnabled(true)
         binding.webview.settings.setSupportMultipleWindows(true) // This forces ChromeClient enabled.
         binding.webview.settings.setDomStorageEnabled(true)
+        binding.webview.addJavascriptInterface(WebViewToAppInterface(requireActivity()), "Android")
         pageLoaded = false
         binding.webview.loadUrl(website_url)
     }

@@ -87,9 +87,11 @@ function apply_colour(product_div,colour_div,css_class,short_text,best_match) {
     cell2.appendChild(linkText);
     link.appendChild(table);
     link.title = "For more details click here to go to the ethical consumer website";
-    link.href = best_match.bb.link;
+    link.href = "#"; //best_match.bb.link;
     link.setAttribute('target','_blank');
-    link.addEventListener('click', (e) => { e.stopPropagation(); }, false);
+    //link.onclick = function () { Android.navigateToEthicalConsumer(best_match.bb.link); return false; };
+    //link.onclick = ";return false;";
+    link.addEventListener('click', (e) => { Android.navigateToEthicalConsumer(best_match.bb.link); e.stopPropagation(); }, false);
     if(css_class) {
         link.className=css_class;
     }
