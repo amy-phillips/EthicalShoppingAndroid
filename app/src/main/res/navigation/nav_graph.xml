@@ -84,6 +84,6 @@
     <fragment
         android:id="@+id/mySettingsFragment"
         android:name="uk.co.islovely.ethicalshopping.MySettingsFragment"
-        android:label="activity_settings"
+        android:label="@string/settings_label"
         tools:layout="@layout/activity_settings" />
 </navigation>
