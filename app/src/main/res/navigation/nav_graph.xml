@@ -49,6 +49,9 @@
                 android:name="website"
                 android:defaultValue="milkandmore" />
         </action>
+        <action
+            android:id="@+id/action_FirstFragment_to_mySettingsFragment"
+            app:destination="@id/mySettingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
@@ -63,6 +66,9 @@
             android:name="website"
             app:argType="string"
             android:defaultValue="tesco" />
+        <action
+            android:id="@+id/action_SecondFragment_to_mySettingsFragment"
+            app:destination="@id/mySettingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/ethicalConsumerFragment"
@@ -71,5 +77,13 @@
         <action
             android:id="@+id/action_ethicalConsumerFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
+        <action
+            android:id="@+id/action_ethicalConsumerFragment_to_mySettingsFragment"
+            app:destination="@id/mySettingsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/mySettingsFragment"
+        android:name="uk.co.islovely.ethicalshopping.MySettingsFragment"
+        android:label="activity_settings"
+        tools:layout="@layout/activity_settings" />
 </navigation>
