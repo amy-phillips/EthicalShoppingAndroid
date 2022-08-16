@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.preference.CheckBoxPreference
         android:defaultValue="false"
-        android:icon="@android:drawable/ic_dialog_info"
+        android:icon="@android:drawable/ic_dialog_alert"
         android:key="settings_debug"
         android:summary="@string/moreinfo_debugging"
         android:title="@string/action_debugging" />
@@ -11,5 +12,17 @@
     <androidx.preference.Preference
         android:key="settings_feedback"
         android:summary="@string/moreinfo_feedback"
-        android:title="@string/action_feedback" />
+        android:title="@string/action_feedback"
+        android:icon="@android:drawable/sym_action_email">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="mailto:ethics@thinkysaurus.co.uk">
+            <extra
+                android:name="android.intent.extra.SUBJECT"
+                android:value="Ethical Shopping Android Feedback" />
+            <extra
+                android:name="android.intent.extra.TEXT"
+                android:value="Hi Amy!  Here's some useful feedback on your Ethical Shopping Android App:  Thank you very much!" />
+        </intent>
+    </androidx.preference.Preference>
 </androidx.preference.PreferenceScreen>
