@@ -1,5 +1,6 @@
 package uk.co.islovely.ethicalshopping
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,10 +15,12 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import uk.co.islovely.ethicalshopping.databinding.FragmentSecondBinding
 import java.io.BufferedReader
 import java.io.InputStream
 import java.lang.Deprecated
+
 
 //TODO fix the more details link to take you to ethical consumer
 
@@ -158,7 +161,9 @@ function get_score_tables() {
     return;
 }
 """
-        val debug_enum=2
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val want_debug = sharedPreferences.getBoolean("settings_debug", false)
+        val debug_enum=if(want_debug){2}else{0}
         val debugging = """
             // set to 
             // 0 for no extra debug
