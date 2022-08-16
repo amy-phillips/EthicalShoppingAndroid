@@ -59,13 +59,9 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> {
                 //TODO navigate using actions?  https://developer.android.com/guide/navigation/navigation-navigate
                 val currentFragment = supportFragmentManager.fragments.last()
-                //val navHostFragment = supportFragmentManager.findFragmentById(R.id.FirstFragment) as NavHostFragment
                 val navController = currentFragment.findNavController()
-                //val navController = findNavController(R.id.FirstFragment)
-                //val navController = Navigation.findNavController(this, R.id.nav_graph)
                 navController.navigate(R.id.mySettingsFragment)
                 true
-                //item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
             }
             else -> super.onOptionsItemSelected(item)
         }
