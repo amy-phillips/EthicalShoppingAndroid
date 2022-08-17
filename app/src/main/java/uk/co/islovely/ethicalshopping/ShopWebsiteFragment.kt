@@ -1,6 +1,5 @@
 package uk.co.islovely.ethicalshopping
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -16,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
-import uk.co.islovely.ethicalshopping.databinding.FragmentSecondBinding
+import uk.co.islovely.ethicalshopping.databinding.FragmentShopwebsiteBinding
 import java.io.BufferedReader
 import java.io.InputStream
 import java.lang.Deprecated
@@ -29,7 +28,7 @@ import java.lang.Deprecated
  */
 class ShopWebsiteFragment : Fragment() {
 
-    private var _binding: FragmentSecondBinding? = null
+    private var _binding: FragmentShopwebsiteBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -46,8 +45,9 @@ class ShopWebsiteFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        _binding = FragmentShopwebsiteBinding.inflate(inflater, container, false)
 
+        //TODO pass website as an enum rather than a string
         val website = args.website
         if (website == "tesco") {
             website_url = "https://www.tesco.com/groceries"
