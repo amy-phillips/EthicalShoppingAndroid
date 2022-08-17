@@ -16,7 +16,7 @@
             app:destination="@id/ShopWebsiteFragment" >
             <argument
                 android:name="website"
-                android:defaultValue="tesco" />
+                android:defaultValue="" />
         </action>
         <action
             android:id="@+id/action_FirstFragment_to_ethicalConsumerFragment"
@@ -65,13 +65,15 @@
         <argument
             android:name="website"
             app:argType="string"
-            android:defaultValue="tesco" />
+            android:defaultValue="" />
         <action
             android:id="@+id/action_ShopWebsiteFragment_to_mySettingsFragment"
             app:destination="@id/mySettingsFragment" />
         <action
             android:id="@+id/action_ShopWebsiteFragment_to_ethicalConsumerFragment"
-            app:destination="@id/ethicalConsumerFragment" >
+            app:destination="@id/ethicalConsumerFragment"
+            app:launchSingleTop="false"
+            app:popUpToInclusive="false">
             <argument
                 android:name="url"
                 android:defaultValue="set url please" />

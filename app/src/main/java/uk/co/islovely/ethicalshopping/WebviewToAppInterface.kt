@@ -10,11 +10,7 @@ class WebViewToAppInterface (private val context: Context) {
 
     @JavascriptInterface
     fun navigateToEthicalConsumer(url:String){
-        println("executed from js")
-        println(url)
-
         // I assume I'm in the shop website fragment here, if not who knows what happened!
-        //val fragment = (context as Activity).getSupportFragmentManager().findFragmentById(R.id.pageview)
         val navController = Navigation.findNavController(context as Activity, R.id.nav_host_fragment_content_main)
         val action = ShopWebsiteFragmentDirections.actionShopWebsiteFragmentToEthicalConsumerFragment()
         action.url = url

@@ -37,7 +37,7 @@ class ShopWebsiteFragment : Fragment() {
     private var amSubscribed : Boolean = false
     private var pageLoaded : Boolean = false
     private val LOGTAG = "ShopWebsiteFragment"
-    private var website_url = "https://www.tesco.com/groceries/en-GB/products/256174499"
+    private var website_url : String = ""
     private var js_resource = R.raw.tesco
     private val args: ShopWebsiteFragmentArgs by navArgs()
 
@@ -47,26 +47,31 @@ class ShopWebsiteFragment : Fragment() {
     ): View {
         _binding = FragmentShopwebsiteBinding.inflate(inflater, container, false)
 
-        //TODO pass website as an enum rather than a string
-        val website = args.website
-        if (website == "tesco") {
-            website_url = "https://www.tesco.com/groceries"
-            js_resource = R.raw.tesco
-        } else if(website == "sainsburys") {
-            website_url = "https://www.sainsburys.co.uk/shop/gb/groceries"
-            js_resource = R.raw.sainsburys
-        } else if(website == "asda") {
-            website_url = "https://groceries.asda.com"
-            js_resource = R.raw.asda
-        } else if(website == "boots") {
-            website_url = "https://www.boots.com"
-            js_resource = R.raw.boots
-        } else if(website == "milkandmore") {
-            website_url = "https://www.milkandmore.co.uk"
-            js_resource = R.raw.milkandmore
-        } else {
-            assert(false)
+        if(website_url == "") {
+            val website = args.website
+            if (website == "tesco") {
+                website_url = "https://www.tesco.com/groceries"
+                js_resource = R.raw.tesco
+            } else if(website == "sainsburys") {
+                website_url = "https://www.sainsburys.co.uk/shop/gb/groceries"
+                js_resource = R.raw.sainsburys
+            } else if(website == "asda") {
+                website_url = "https://groceries.asda.com"
+                js_resource = R.raw.asda
+            } else if(website == "boots") {
+                website_url = "https://www.boots.com"
+                js_resource = R.raw.boots
+            } else if(website == "milkandmore") {
+                website_url = "https://www.milkandmore.co.uk"
+                js_resource = R.raw.milkandmore
+            } else {
+                assert(false)
+            }
         }
+
+        // if we are restoring stashed state, then restore the url we want the webview to point at
+        // if we are returning to a fragment on the backstack then website_url will already be set
+        website_url = savedInstanceState?.getString("url") ?: website_url
 
         return binding.root
 
@@ -238,6 +243,14 @@ function get_score_tables() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if(binding != null) {
+            outState.putString("url", binding.webview.url)
+        }
+
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -258,13 +271,12 @@ function get_score_tables() {
         // kick off getting score tables
         ScoresRepository.startGettingScores(::scoresProgressCallback)
 
-        //(activity as AppCompatActivity?)!!.supportActionBar!!.setTitle("Home")
-
         binding.webview.webViewClient = object : WebViewClient() {
             @Deprecated
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                 if (url != null) {
                     pageLoaded = false
+                    website_url = url
                     binding.webview.loadUrl(url)
                 }
                 return false
@@ -276,6 +288,7 @@ function get_score_tables() {
                 request: WebResourceRequest
             ): Boolean {
                 pageLoaded = false
+                website_url = request.url.toString()
                 binding.webview.loadUrl(request.url.toString())
                 return false
             }

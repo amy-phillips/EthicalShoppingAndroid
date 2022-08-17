@@ -11,6 +11,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import uk.co.islovely.ethicalshopping.databinding.FragmentShopwebsiteBinding
@@ -31,7 +32,7 @@ class EthicalConsumerFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-
+        (activity as AppCompatActivity?)!!.supportActionBar!!.setTitle(R.string.ethical_consumer_fragment_label)
         _binding = FragmentShopwebsiteBinding.inflate(inflater, container, false)
         website_url = args.url
         return binding.root
