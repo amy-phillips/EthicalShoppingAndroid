@@ -11,16 +11,19 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import uk.co.islovely.ethicalshopping.databinding.FragmentSecondBinding
+import androidx.navigation.fragment.navArgs
+import uk.co.islovely.ethicalshopping.databinding.FragmentShopwebsiteBinding
 
 /**
- * A simple [Fragment] subclass as the second destination in the navigation.
+ * Displays the Ethical Consumer website, for logging in, and for more details on a particular product
  */
 class EthicalConsumerFragment : Fragment() {
 
-    private var _binding: FragmentSecondBinding? = null
-
+    private var _binding: FragmentShopwebsiteBinding? = null
+    private var website_url = "https://www.ethicalconsumer.org/"
+    private val args: EthicalConsumerFragmentArgs by navArgs()
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -29,8 +32,9 @@ class EthicalConsumerFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-
-        _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        (activity as AppCompatActivity?)!!.supportActionBar!!.setTitle(R.string.ethical_consumer_fragment_label)
+        _binding = FragmentShopwebsiteBinding.inflate(inflater, container, false)
+        website_url = args.url
         return binding.root
 
     }
@@ -52,8 +56,8 @@ class EthicalConsumerFragment : Fragment() {
             callback
         )
 
-        binding.webview.getSettings().setJavaScriptEnabled(true);
-        binding.webview.loadUrl("https://www.ethicalconsumer.org/")
+        binding.webview.settings.setJavaScriptEnabled(true);
+        binding.webview.loadUrl(website_url)
 
         binding.webview.webViewClient = object: WebViewClient(){
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {

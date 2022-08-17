@@ -13,38 +13,38 @@
 
         <action
             android:id="@+id/action_FirstFragment_to_Tesco"
-            app:destination="@id/SecondFragment" >
+            app:destination="@id/ShopWebsiteFragment" >
             <argument
                 android:name="website"
-                android:defaultValue="tesco" />
+                android:defaultValue="" />
         </action>
         <action
             android:id="@+id/action_FirstFragment_to_ethicalConsumerFragment"
             app:destination="@id/ethicalConsumerFragment" />
         <action
             android:id="@+id/action_FirstFragment_to_Sainsburys"
-            app:destination="@id/SecondFragment" >
+            app:destination="@id/ShopWebsiteFragment" >
             <argument
                 android:name="website"
                 android:defaultValue="sainsburys" />
         </action>
         <action
             android:id="@+id/action_FirstFragment_to_Asda"
-            app:destination="@id/SecondFragment">
+            app:destination="@id/ShopWebsiteFragment">
             <argument
                 android:name="website"
                 android:defaultValue="asda" />
         </action>
         <action
             android:id="@+id/action_FirstFragment_to_Boots"
-            app:destination="@id/SecondFragment">
+            app:destination="@id/ShopWebsiteFragment">
             <argument
                 android:name="website"
                 android:defaultValue="boots" />
         </action>
         <action
             android:id="@+id/action_FirstFragment_to_MilkAndMore"
-            app:destination="@id/SecondFragment">
+            app:destination="@id/ShopWebsiteFragment">
             <argument
                 android:name="website"
                 android:defaultValue="milkandmore" />
@@ -54,21 +54,30 @@
             app:destination="@id/mySettingsFragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
+        android:id="@+id/ShopWebsiteFragment"
         android:name="uk.co.islovely.ethicalshopping.ShopWebsiteFragment"
         android:label="@string/tesco_fragment_label"
-        tools:layout="@layout/fragment_second">
+        tools:layout="@layout/fragment_shopwebsite">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            android:id="@+id/action_ShopWebsiteFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
         <argument
             android:name="website"
             app:argType="string"
-            android:defaultValue="tesco" />
+            android:defaultValue="" />
         <action
-            android:id="@+id/action_SecondFragment_to_mySettingsFragment"
+            android:id="@+id/action_ShopWebsiteFragment_to_mySettingsFragment"
             app:destination="@id/mySettingsFragment" />
+        <action
+            android:id="@+id/action_ShopWebsiteFragment_to_ethicalConsumerFragment"
+            app:destination="@id/ethicalConsumerFragment"
+            app:launchSingleTop="false"
+            app:popUpToInclusive="false">
+            <argument
+                android:name="url"
+                android:defaultValue="set url please" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/ethicalConsumerFragment"
@@ -80,6 +89,10 @@
         <action
             android:id="@+id/action_ethicalConsumerFragment_to_mySettingsFragment"
             app:destination="@id/mySettingsFragment" />
+        <argument
+            android:name="url"
+            app:argType="string"
+            android:defaultValue="https://www.ethicalconsumer.org/" />
     </fragment>
     <fragment
         android:id="@+id/mySettingsFragment"
