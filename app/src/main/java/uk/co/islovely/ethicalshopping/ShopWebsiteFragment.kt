@@ -245,10 +245,7 @@ function get_score_tables() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if(binding != null) {
-            outState.putString("url", binding.webview.url)
-        }
-
+        outState.putString("url", _binding?.webview?.url)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -335,6 +332,9 @@ function get_score_tables() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // must nuke these as the callbacks want binding not to be null!
+        binding.webview.webViewClient = object : WebViewClient() {}
+        binding.webview.webChromeClient = object : WebChromeClient() {}
         _binding = null
         pageLoaded = false
         foodSections = emptyList()

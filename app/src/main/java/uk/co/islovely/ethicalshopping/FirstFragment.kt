@@ -12,8 +12,9 @@ import androidx.navigation.fragment.findNavController
 import uk.co.islovely.ethicalshopping.databinding.FragmentFirstBinding
 
 /**
- * A simple [Fragment] subclass as the default destination in the navigation.
+ * A list of supported shops with links to them, and information about whether you are logged into the Ethical Consumer website
  */
+// TODO make the list of shops scrollable for smaller devices
 class FirstFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null

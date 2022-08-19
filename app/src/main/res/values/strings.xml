@@ -10,7 +10,7 @@
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">Choose Shop</string>
     <string name="ethical_consumer_fragment_label">Ethical Consumer</string>
-    <string name="tesco_fragment_label">Tesco</string>
+    <string name="default_shop_fragment_label">Shopping</string>
     <string name="settings_label">Settings</string>
     <string name="tesco">Tesco</string>
     <string name="sainsburys">Sainsbury\'s</string>

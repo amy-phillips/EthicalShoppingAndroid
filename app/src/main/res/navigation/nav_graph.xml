@@ -16,7 +16,7 @@
             app:destination="@id/ShopWebsiteFragment" >
             <argument
                 android:name="website"
-                android:defaultValue="" />
+                android:defaultValue="tesco" />
         </action>
         <action
             android:id="@+id/action_FirstFragment_to_ethicalConsumerFragment"
@@ -56,7 +56,7 @@
     <fragment
         android:id="@+id/ShopWebsiteFragment"
         android:name="uk.co.islovely.ethicalshopping.ShopWebsiteFragment"
-        android:label="@string/tesco_fragment_label"
+        android:label="@string/default_shop_fragment_label"
         tools:layout="@layout/fragment_shopwebsite">
 
         <action
