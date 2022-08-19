@@ -11,10 +11,12 @@ class WebViewToAppInterface (private val context: Context) {
     @JavascriptInterface
     fun navigateToEthicalConsumer(url:String){
         // I assume I'm in the shop website fragment here, if not who knows what happened!
-        val navController = Navigation.findNavController(context as Activity, R.id.nav_host_fragment_content_main)
-        val action = ShopWebsiteFragmentDirections.actionShopWebsiteFragmentToEthicalConsumerFragment()
-        action.url = url
-        navController.navigate(action)
+        // run this on main thread, or when you rotate the screen you'll get a stupid exception about the backstack state
+        (context as Activity)?.runOnUiThread(java.lang.Runnable {
+            val navController = Navigation.findNavController(context as Activity, R.id.nav_host_fragment_content_main)
+            val action = ShopWebsiteFragmentDirections.actionShopWebsiteFragmentToEthicalConsumerFragment()
+            action.url = url
+            navController.navigate(action)
+        })
     }
-
 }

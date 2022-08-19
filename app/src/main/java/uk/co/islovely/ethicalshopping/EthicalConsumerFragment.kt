@@ -32,7 +32,6 @@ class EthicalConsumerFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        (activity as AppCompatActivity?)!!.supportActionBar!!.setTitle(R.string.ethical_consumer_fragment_label)
         _binding = FragmentShopwebsiteBinding.inflate(inflater, container, false)
         website_url = args.url
         return binding.root
@@ -41,6 +40,8 @@ class EthicalConsumerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        (activity as AppCompatActivity?)?.supportActionBar?.setTitle(R.string.ethical_consumer_fragment_label)
 
         val callback: OnBackPressedCallback = object : OnBackPressedCallback(
             true // default to enabled

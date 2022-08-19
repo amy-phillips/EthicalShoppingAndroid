@@ -71,21 +71,16 @@
             app:destination="@id/mySettingsFragment" />
         <action
             android:id="@+id/action_ShopWebsiteFragment_to_ethicalConsumerFragment"
-            app:destination="@id/ethicalConsumerFragment"
-            app:launchSingleTop="false"
-            app:popUpToInclusive="false">
+            app:destination="@id/ethicalConsumerFragment">
             <argument
                 android:name="url"
-                android:defaultValue="set url please" />
+                android:defaultValue="https://www.ethicalconsumer.org/subscriptions" />
         </action>
     </fragment>
     <fragment
         android:id="@+id/ethicalConsumerFragment"
         android:name="uk.co.islovely.ethicalshopping.EthicalConsumerFragment"
         android:label="EthicalConsumerFragment" >
-        <action
-            android:id="@+id/action_ethicalConsumerFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
         <action
             android:id="@+id/action_ethicalConsumerFragment_to_mySettingsFragment"
             app:destination="@id/mySettingsFragment" />
