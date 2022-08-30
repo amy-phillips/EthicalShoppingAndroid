@@ -12,7 +12,7 @@ function colour_page(response) {
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             // want to colour in the tile-content box
             var tile_content=product_div.parentNode;
-            while(tile_content && tile_content.classList && !tile_content.classList.contains("tile-content")) {
+            while(tile_content && tile_content.classList && !tile_content.classList.contains("tile-content") && !tile_content.classList.contains("product-details--wrapper")) {
                 tile_content=tile_content.parentNode;
             }
             if(!tile_content || !tile_content.classList) {
