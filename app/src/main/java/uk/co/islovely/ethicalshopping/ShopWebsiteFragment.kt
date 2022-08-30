@@ -274,7 +274,6 @@ function get_score_tables() {
                 if (url != null) {
                     pageLoaded = false
                     website_url = url
-                    binding.webview.loadUrl(url)
                 }
                 return false
             }
@@ -286,7 +285,6 @@ function get_score_tables() {
             ): Boolean {
                 pageLoaded = false
                 website_url = request.url.toString()
-                binding.webview.loadUrl(request.url.toString())
                 return false
             }
 
