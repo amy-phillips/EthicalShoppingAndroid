@@ -85,7 +85,7 @@ class ShopWebsiteFragment : Fragment() {
             }
             responseJson += "{"
             responseJson += "\"title\":\"${food.title.replace("\"", "")}\","
-            responseJson += "\"link\":\"https://www.ethicalconsumer.org${url}#score-table\""
+            responseJson += "\"link\":\"${url}\""
             responseJson += "}\n"
         }
         return responseJson
@@ -116,10 +116,17 @@ class ShopWebsiteFragment : Fragment() {
                     */
         var responseJson = "{\"scores\":{"
 
-        for ((index, section) in foodSections.withIndex()) {
-            if(index>0) {
+        var first_value=true
+        for (section in foodSections) {
+            if(section.good_foods.isEmpty() && section.average_foods.isEmpty() && section.bad_foods.isEmpty())
+            {
+                Log.d(LOGTAG, "Skipping "+section.title+" because it is empty")
+                continue
+            }
+            if(!first_value) {
                 responseJson += ","
             }
+            first_value=false
             responseJson += "\"${section.location}\":{"
             responseJson += "\"title\":\"${section.title.replace("\"", "")}\","
             responseJson += "\"table\":{"
@@ -168,7 +175,7 @@ function get_score_tables() {
 """
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val want_debug = sharedPreferences.getBoolean("settings_debug", false)
-        val debug_enum=if(want_debug){2}else{0}
+        val debug_enum=if(want_debug){3}else{0}
         val debugging = """
             // set to 
             // 0 for no extra debug

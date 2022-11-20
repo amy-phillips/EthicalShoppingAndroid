@@ -24,6 +24,7 @@ function get_best_match(munged_tables, raw_product_name) {
                 best_match={};
                 best_match.matchiness=matchiness;
                 best_match.bb=bb;
+                best_match.preprocessed_product_name=preprocessed_product_name;
                 best_match.colour=col_tbl.colour;
                 best_match.product_name=product_name; // for debugging
             }
@@ -81,9 +82,11 @@ function apply_colour(product_div,colour_div,css_class,short_text,best_match) {
     if(!short_text) { // more space so can be more verbose
         linkText = document.createTextNode("More details ("+best_match.bb.title+") at "+best_match.bb.link);
     }
-    if(DEBUGGING>=2) {
+    if(DEBUGGING>=3) {
+        linkText = document.createTextNode("More details ("+best_match.bb.title+" - all_of:"+best_match.bb.preprocessed_title.all_of+"["+best_match.bb.preprocessed_title.all_of.length+"] one_of:"+best_match.bb.preprocessed_title.one_of+"["+best_match.bb.preprocessed_title.one_of.length+"]) ("+best_match.product_name+" - all_of:"+best_match.preprocessed_product_name.all_of+" one_of:"+best_match.preprocessed_product_name.one_of+") ("+best_match.matchiness+") at "+best_match.bb.link);
+    } else if(DEBUGGING>=2) {
         linkText = document.createTextNode("More details ("+best_match.bb.title+") ("+best_match.product_name+") ("+best_match.matchiness+") at "+best_match.bb.link);
-    } 
+    }
     cell2.appendChild(linkText);
     link.appendChild(table);
     link.title = "For more details click here to go to the ethical consumer website";

@@ -4,6 +4,9 @@ import android.os.Build
 import android.text.Html
 import android.util.Log
 import android.webkit.CookieManager
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
@@ -17,9 +20,10 @@ object ScoresRepository {
     private var progressCallback: ((Int, Boolean, List<FoodSection>) -> Unit) ?= null
     private var busy : Thread = Thread()
 
-    init {
-        println("ScoresRepository class invoked.")
-    }
+    private val enableEthicalConsumer = true
+    private val enableGoodShoppingGuide = true
+
+    private val REFRESH_MILLIS : Long = 5*60*1000
 
     // call this when entering a fragment that wants to know score info
     fun startGettingScores(_progressCallback: (percentage: Int, subscribed: Boolean, foodsections: List<FoodSection>) -> Unit)
@@ -27,13 +31,16 @@ object ScoresRepository {
         progressCallback = _progressCallback
         // if not already getting scores kick off getting/refreshing scores
         if(!busy.isAlive) {
-            busy = Thread {
+            val STACK_SIZE :Long=3000000
+            val group = ThreadGroup("getScoresGroup")
+            busy = Thread(group, Runnable {
                 try {
                     getScoreTables()
                 } catch (e: Exception) {
                     Log.e(LOGTAG, e.message!!)
                 }
-            }
+            }, "getScoresThread",STACK_SIZE)
+
             busy.start()
         }
     }
@@ -102,47 +109,47 @@ object ScoresRepository {
         foodSections.add(new_food)
     }
 
-    private fun addAnyNewFoodSections(new_foods : MutableList<FoodSection>) {
-        // we match by name to check if a food already exists in our list
-        for(new_food in new_foods) {
-            addAnyNewFoodSection(new_food)
-        }
-    }
-
-    private fun getScoreTables() {
-        progressCallback?.invoke(0, false, emptyList())
-
-        val ecUrl = URL("https://www.ethicalconsumer.org/")
-        val ecUrlConnection = ecUrl.openConnection() as HttpsURLConnection
-        // if the player has signed in in the EC webview, this will have set a cookie,
-        // grab the cookies, so we will get the signed in version of the website
-        val ecCookies = CookieManager.getInstance().getCookie("https://www.ethicalconsumer.org/")
-        if (ecCookies != null) {
-            ecUrlConnection.setRequestProperty("Cookie", ecCookies)
-        }
-
+    private fun getEthicalConsumerFoodSections() {
         try {
-            val ecData = ecUrlConnection.inputStream.bufferedReader().readText()
+            val ecUrl = URL("https://www.ethicalconsumer.org/")
+            val ecUrlConnection = ecUrl.openConnection() as HttpsURLConnection
+            // if the player has signed in in the EC webview, this will have set a cookie,
+            // grab the cookies, so we will get the signed in version of the website
+            val ecCookies = CookieManager.getInstance().getCookie(ecUrl.toString())
+            if (ecCookies != null) {
+                ecUrlConnection.setRequestProperty("Cookie", ecCookies)
+            }
+
+            val ecData: String = ecUrlConnection.inputStream.bufferedReader().readText()
             ecUrlConnection.inputStream.close()
             ecUrlConnection.disconnect()
+
+            val doc: Document = Jsoup.parse(ecData)
             // is there a call to action to subscribe?
-            val sub = Regex("<button[^>]*?value=\"Sign in \">")
-            val am_subscribed = !sub.containsMatchIn(ecData)
+            val sign_in_button: Elements = doc.select("[value=\"Sign in \"]")
+            val am_subscribed = sign_in_button.size == 0
             // let UI know if we're subscribed/logged in
             progressCallback?.invoke(1, am_subscribed, emptyList())
 
             // parse out product guides - food and drink
-            addAnyNewFoodSections(parseProductGuides("<a class=\"more\" href=\"/food-drink\">Food &amp; Drink guides, news and features</a>",ecData))
+            val food_matches: Elements = doc.select("[href^=\"/food-drink/\"]")
+            for(product in food_matches) {
+                addAnyNewFoodSection(FoodSection(ecUrl.toString() + product.attr("href")))
+            }
+
             //health and beauty
-            addAnyNewFoodSections(parseProductGuides("<a class=\"more\" href=\"/health-beauty\">Health &amp; Beauty guides, news and features</a>",ecData))
+            val health_matches: Elements = doc.select("[href^=\"/health-beauty/\"]")
+            for(product in health_matches) {
+                addAnyNewFoodSection(FoodSection(ecUrl.toString() + product.attr("href")))
+            }
 
             // some more products that are stocked by supermarkets - don;t want all of home and garden tho
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/dishwasher-detergent"))
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/household-cleaners"))
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/laundry-detergents"))
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/toilet-cleaners"))
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/toilet-paper"))
-            addAnyNewFoodSection(FoodSection("/home-garden/shopping-guide/washing-liquid"))
+            addAnyNewFoodSection(FoodSection(ecUrl.toString() + "/home-garden/shopping-guide/dishwasher-detergent"))
+            addAnyNewFoodSection(FoodSection(ecUrl.toString() + "/home-garden/shopping-guide/household-cleaners"))
+            addAnyNewFoodSection(FoodSection(ecUrl.toString() + "/home-garden/shopping-guide/laundry-detergents"))
+            addAnyNewFoodSection(FoodSection(ecUrl.toString() + "/home-garden/shopping-guide/toilet-cleaners"))
+            addAnyNewFoodSection(FoodSection(ecUrl.toString() + "/home-garden/shopping-guide/toilet-paper"))
+            addAnyNewFoodSection(FoodSection(ecUrl.toString() + "/home-garden/shopping-guide/washing-liquid"))
 
             // strip out perfume shops because it has short names and doesn't help
             foodSections.remove(FoodSection("/health-beauty/shopping-guide/perfume-shops"))
@@ -156,14 +163,65 @@ object ScoresRepository {
                 }
             }
             wasSubscribed=am_subscribed
+        } catch (e: Exception) {
+            Log.d(LOGTAG, "Failed to parse foods $e")
+        }
+    }
 
+    private fun getGoodShoppingFoodSections() {
+        try {
+            val ecUrl = URL("https://thegoodshoppingguide.com/")
+            val ecUrlConnection = ecUrl.openConnection() as HttpsURLConnection
+            val ecData: String = ecUrlConnection.inputStream.bufferedReader().readText()
+            ecUrlConnection.inputStream.close()
+            ecUrlConnection.disconnect()
+
+            val doc = Jsoup.parse(ecData)
+
+            // parse out product guides - for now ALL OF THEM
+            // TODO fewer?
+            val all_matches: Elements = doc.select("[href^=\"https://thegoodshoppingguide.com/subject/\"]")
+            for(product in all_matches) {
+                addAnyNewFoodSection(FoodSection(product.attr("href")))
+            }
+        } catch (e: Exception) {
+            Log.d(LOGTAG, "Failed to parse foods $e")
+        }
+    }
+
+    private fun parseGoodShoppingEntries(doc:org.jsoup.nodes.Element, rating:Rating, fs: FoodSection) {
+        var cssSelect:String=".high"
+        var food_list: MutableList<Food>? = null
+        if(rating==Rating.GOOD) {
+            cssSelect=".bg-brand_row-good"
+            food_list = fs.good_foods
+        } else if(rating==Rating.BAD) {
+            cssSelect=".bg-brand_row-poor"
+            food_list = fs.bad_foods
+        }
+        val entries: Elements = doc.select(cssSelect)
+        for (entry in entries) {
+            val title_entry = entry.select("h3")
+            val title =
+                fixupOverlyShortTitles(unescape(title_entry.text())) // flake matches too many things - hack it
+            food_list?.add(
+                Food(
+                    title,
+                    rating,
+                    fs.location
+                )
+            )
+        }
+    }
+
+    private fun downloadScoreTables() {
+        try {
             // request all the pages - eventually parallelise this
             for (fs in foodSections) {
                 val index = foodSections.indexOf(fs)
                 val progress: Float = 100.0f*index.toFloat()/foodSections.size.toFloat()
                 Log.d(LOGTAG, "Progress $index / ${foodSections.size}")
-                progressCallback?.invoke(progress.toInt(), am_subscribed, foodSections)
-                val REFRESH_MILLIS : Long = 5*60*1000
+                progressCallback?.invoke(progress.toInt(), wasSubscribed, foodSections)
                 if(fs.last_success != 0L && System.currentTimeMillis() - fs.last_success < REFRESH_MILLIS)
                 {
                     Log.d(LOGTAG,"Skipping food $fs because ${fs.last_success}")
@@ -175,82 +233,71 @@ object ScoresRepository {
                 fs.average_foods.clear()
                 fs.bad_foods.clear()
 
-                val url = URL("https://www.ethicalconsumer.org" + fs.location)
-                val urlConnection = url.openConnection() as HttpsURLConnection
-                val cookies =
-                    CookieManager.getInstance().getCookie("https://www.ethicalconsumer.org/")
-                if (cookies != null) {
-                    urlConnection.setRequestProperty("Cookie", cookies)
+                val url = URL(fs.location)
+                val cookie =
+                    CookieManager.getInstance().getCookie(url.host)
+                var doc : Document
+                if(cookie == null) {
+                    doc = Jsoup.connect(fs.location).get()
+                } else {
+                    doc = Jsoup.connect(fs.location)
+                        .cookie(cookie,cookie).get()
                 }
 
-                val data = urlConnection.inputStream.bufferedReader().readText()
-                urlConnection.inputStream.close()
-                urlConnection.disconnect()
-                val titleregex = Regex("<h1 class=\"title\">\\s*([\\w\\s&;,-]+?)[\\s]*<")
-                val titlematch = titleregex.find(data)
-                fs.title = unescape(titlematch?.groupValues?.get(1) ?: "error")
+                if(url.host == "www.ethicalconsumer.org") {
+                    fs.title = doc.title().replace("| Ethical Consumer","")
 
-                // parse the score table
-                val tableregex = Regex("<table class=\"table\"(.*?)<\\/table>", RegexOption.DOT_MATCHES_ALL) //gms.exec(data);
-                val tablematch = tableregex.find(data)
-                val tabledata = tablematch?.groupValues?.get(1)
-                val tableentryregex = Regex(
-                    "<h4>([^<]*)<\\/h4>(?:.*?)?<div class=\"score (\\w+)\">",
-                    RegexOption.DOT_MATCHES_ALL
-                ) //gms;
-                if(tabledata != null) {
-                    var tableentry = tableentryregex.find(tabledata)
-                    while (tableentry != null)
-                    {
-                        try {
-                            val rating=Rating.valueOf(tableentry.groupValues.get(2).uppercase())
-                            val title=fixupOverlyShortTitles(unescape(tableentry.groupValues.get(1))) // flake matches too many things - hack it!
-                            var food_list: MutableList<Food>? = null
-                            if(rating==Rating.GOOD) {
-                                food_list = fs.good_foods
-                            } else if(rating==Rating.AVERAGE) {
-                                food_list = fs.average_foods
-                            } else if(rating==Rating.BAD) {
-                                food_list = fs.bad_foods
-                            } else {
-                                Log.e(LOGTAG, "Unexpected rating $rating")
-                                continue
-                            }
+                    // parse the score table
 
-                            food_list.add(Food(title, rating, "https://www.ethicalconsumer.org${fs.location}#score-table"))
-                        } catch (e: Exception) {
-                            Log.d(LOGTAG, "Failed to parse rating $e")
+                    // skip to the table
+                    val table = doc.select("div .table-responsive")
+                    val table_entries: Elements = table.select("tr[data-category-scores]")
+                    for(entry in table_entries) {
+                        val title_entry = entry.select("h4")
+                        val title=fixupOverlyShortTitles(unescape(title_entry.text())) // flake matches too many things - hack it
+                        if(entry.select(".score.good").size > 0) {
+                            fs.good_foods.add(Food(title, Rating.GOOD, "https://www.ethicalconsumer.org${fs.location}#score-table"))
+                        } else if(entry.select(".score.average").size > 0) {
+                            fs.average_foods.add(Food(title, Rating.AVERAGE, "https://www.ethicalconsumer.org${fs.location}#score-table"))
+                        } else if(entry.select(".score.bad").size > 0) {
+                            fs.bad_foods.add(Food(title, Rating.BAD, "https://www.ethicalconsumer.org${fs.location}#score-table"))
                         }
+                    }
+                } else if(url.host == "thegoodshoppingguide.com") {
+                    fs.title = doc.title().replace("- The Good Shopping Guide","")
 
-                        tableentry = tableentry.next()
+                    // parse the score table
+                    val tables = doc.select("#rating__rows")
+                    for(table in tables) {
+                        parseGoodShoppingEntries(table,Rating.GOOD, fs)
+                        parseGoodShoppingEntries(table,Rating.BAD, fs)
                     }
                 }
+
                 if(fs.good_foods.size > 0 || fs.average_foods.size > 0 || fs.bad_foods.size > 0) {
                     fs.last_success = System.currentTimeMillis()
                 }
             }
             Log.d(LOGTAG, "Progress DONE")
-            progressCallback?.invoke(100, am_subscribed, foodSections)
+            progressCallback?.invoke(100, wasSubscribed, foodSections)
         } catch (e: Exception) {
             Log.d(LOGTAG, "Failed to parse foods $e")
         }
     }
 
-    private fun parseProductGuides(product_selector: String, page_html: String) : MutableList<FoodSection> {
-        var foods=mutableListOf<FoodSection>()
+    private fun getScoreTables() {
+        progressCallback?.invoke(0, false, emptyList())
 
-        val list_selection_regex = Regex(product_selector+".*?<h4>Product Guides</h4>.*?<ul>(.*?)</ul>",setOf(
-            RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL
-        ))
-        val product_list_result = list_selection_regex.find(page_html)
-
-        // then split into each entry (can I do that in regex above? - can't figure it out so KISS)
-        val li_regex = Regex("<a href=\"([^\"]+)",RegexOption.MULTILINE)
-        val product_matches = li_regex.findAll(product_list_result?.value.orEmpty())
-        for(product in product_matches) {
-            foods.add(FoodSection(product.groupValues.get(1)))
+        // first get a list of all sections we want to download
+        if(enableGoodShoppingGuide) {
+            getGoodShoppingFoodSections()
+        }
+        if(enableEthicalConsumer) {
+            getEthicalConsumerFoodSections()
         }
 
-        return foods
+        // then start downloading the sections
+        downloadScoreTables()
     }
+
 }

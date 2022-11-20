@@ -20,7 +20,7 @@
     <string name="ethical_consumer">Ethical Consumer</string>
     <string name="ethical_consumer_requires_login">Ethical Consumer - Login or Subscribe</string>
     <string name="back_to_shop_list">Back to shop selection</string>
-    <string name="download_progress">Ethical Consumer data download progress:</string>
+    <string name="download_progress">Ethical source data download progress:</string>
 
     <string name="hello_first_fragment">Choose a shop</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>

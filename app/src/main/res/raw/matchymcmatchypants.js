@@ -138,6 +138,8 @@ function pre_process_food(name) {
     singles.delete('dairy');
     singles.delete('free');
     singles.delete('and');
+    singles.delete('cooking');
+    singles.delete(''); // if we split a whitespace string we get a single empty entry - doh!
 
     //console.log(name + " ("+processed+") becomes:");
     //console.log(Array.from(singles).join(', '));
