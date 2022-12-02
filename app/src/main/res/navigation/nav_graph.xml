@@ -19,9 +19,6 @@
                 android:defaultValue="tesco" />
         </action>
         <action
-            android:id="@+id/action_FirstFragment_to_ethicalConsumerFragment"
-            app:destination="@id/ethicalConsumerFragment" />
-        <action
             android:id="@+id/action_FirstFragment_to_Sainsburys"
             app:destination="@id/ShopWebsiteFragment" >
             <argument
@@ -50,6 +47,20 @@
                 android:defaultValue="milkandmore" />
         </action>
         <action
+            android:id="@+id/action_FirstFragment_to_ethicalConsumer"
+            app:destination="@id/ethicalWebsiteFragment">
+            <argument
+                android:name="url"
+                android:defaultValue="https://www.ethicalconsumer.org/subscriptions" />
+        </action>
+        <action
+            android:id="@+id/action_FirstFragment_to_goodShoppingGuide"
+            app:destination="@id/ethicalWebsiteFragment">
+            <argument
+                android:name="url"
+                android:defaultValue="https://thegoodshoppingguide.com/subject/ethical-supermarkets/" />
+        </action>
+        <action
             android:id="@+id/action_FirstFragment_to_mySettingsFragment"
             app:destination="@id/mySettingsFragment" />
     </fragment>
@@ -70,19 +81,19 @@
             android:id="@+id/action_ShopWebsiteFragment_to_mySettingsFragment"
             app:destination="@id/mySettingsFragment" />
         <action
-            android:id="@+id/action_ShopWebsiteFragment_to_ethicalConsumerFragment"
-            app:destination="@id/ethicalConsumerFragment">
+            android:id="@+id/action_ShopWebsiteFragment_to_ethicalWebsiteFragment"
+            app:destination="@id/ethicalWebsiteFragment">
             <argument
                 android:name="url"
                 android:defaultValue="https://www.ethicalconsumer.org/subscriptions" />
         </action>
     </fragment>
     <fragment
-        android:id="@+id/ethicalConsumerFragment"
-        android:name="uk.co.islovely.ethicalshopping.EthicalConsumerFragment"
-        android:label="EthicalConsumerFragment" >
+        android:id="@+id/ethicalWebsiteFragment"
+        android:name="uk.co.islovely.ethicalshopping.EthicalWebsiteFragment"
+        android:label="EthicalWebsiteFragment" >
         <action
-            android:id="@+id/action_ethicalConsumerFragment_to_mySettingsFragment"
+            android:id="@+id/action_ethicalWebsiteFragment_to_mySettingsFragment"
             app:destination="@id/mySettingsFragment" />
         <argument
             android:name="url"

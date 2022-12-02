@@ -14,7 +14,7 @@ class WebViewToAppInterface (private val context: Context) {
         // run this on main thread, or when you rotate the screen you'll get a stupid exception about the backstack state
         (context as Activity).runOnUiThread(java.lang.Runnable {
             val navController = Navigation.findNavController(context, R.id.nav_host_fragment_content_main)
-            val action = ShopWebsiteFragmentDirections.actionShopWebsiteFragmentToEthicalConsumerFragment()
+            val action = ShopWebsiteFragmentDirections.actionShopWebsiteFragmentToEthicalWebsiteFragment()
             action.url = url
             navController.navigate(action)
         })

@@ -19,11 +19,11 @@ import uk.co.islovely.ethicalshopping.databinding.FragmentShopwebsiteBinding
 /**
  * Displays the Ethical Consumer website, for logging in, and for more details on a particular product
  */
-class EthicalConsumerFragment : Fragment() {
+class EthicalWebsiteFragment : Fragment() {
 
     private var _binding: FragmentShopwebsiteBinding? = null
     private var website_url = "https://www.ethicalconsumer.org/"
-    private val args: EthicalConsumerFragmentArgs by navArgs()
+    private val args: EthicalWebsiteFragmentArgs by navArgs()
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!

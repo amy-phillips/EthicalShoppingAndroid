@@ -61,7 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/milkandmore"
-        app:layout_constraintBottom_toTopOf="@id/button_ethicalconsumer"
+        app:layout_constraintBottom_toTopOf="@id/spacer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_boots" />
@@ -82,6 +82,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/ethical_consumer"
+        app:layout_constraintBottom_toTopOf="@id/button_goodshoppingguide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/spacer" />
@@ -90,6 +91,9 @@
         android:id="@+id/button_goodshoppingguide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="@string/good_shopping_guide"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_ethicalconsumer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

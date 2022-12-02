@@ -100,7 +100,10 @@ class FirstFragment : Fragment() {
             findNavController().navigate(R.id.action_FirstFragment_to_MilkAndMore)
         }
         binding.buttonEthicalconsumer.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_ethicalConsumerFragment)
+            findNavController().navigate(R.id.action_FirstFragment_to_ethicalConsumer)
+        }
+        binding.buttonGoodshoppingguide.setOnClickListener {
+            findNavController().navigate(R.id.action_FirstFragment_to_goodShoppingGuide)
         }
 
         // kick off getting score tables
